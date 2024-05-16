@@ -4,9 +4,6 @@ on:
   release:
     types: [published]
 
-env:
-  VERSION: ${{ cat package.json | jq -r ".version" }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,6 +24,7 @@ jobs:
 
       - name: Generate docs
         run: |
+          echo "VERSION=$(cat package.json | jq -r ".version")" >> $GITHUB_ENV
           mkdir tmp
           npm run docgen
           mv ./master.json tmp/master.json
