@@ -13,7 +13,7 @@ const clients = [];
  */
 class Client extends EventEmitter {
   /**
-   * @param {string} key API key
+   * @param {string} key API keyyyy
    * @param {ClientOptions} [options={}] Client options
    */
   constructor(key, options = {}) {
