@@ -5,6 +5,9 @@ on:
   release:
     types: [published]
 
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,9 +23,6 @@ jobs:
 
       - name: Publish to npm
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Generate docs
         run: |
           echo "VERSION=$(cat package.json | jq -r ".version")" >> $GITHUB_ENV
