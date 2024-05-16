@@ -1,0 +1,51 @@
+name: New Release
+on:
+  release:
+    types: [published]
+
+env:
+  VERSION: ${{ cat package.json | jq -r ".version" }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Clean up
+        run: npm ci
+
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Generate docs
+        run: |
+          mkdir tmp
+          npm run docgen
+          mv ./master.json tmp/master.json
+          npm run docgen
+          mv master.json tmp/$VERSION.json
+
+      - name: Switch to docs branch
+        run: |
+          git fetch --all
+          git checkout docs --
+
+      - name: Update the docs branch
+        run: |
+          rm master.json
+          mv tmp/master.json master.json
+          mv tmp/$VERSION.json $VERSION.json
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "Docs Updater[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Update Docs"
+          git push origin docs
